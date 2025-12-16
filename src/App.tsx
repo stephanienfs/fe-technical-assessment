@@ -1,9 +1,7 @@
+import WorkflowsPage from "./pages/WorkflowsPage";
+
 function App() {
-  return (
-    <div className="text-lg">
-      Technical assessment
-    </div>
-  )
+  return <WorkflowsPage />;
 }
 
-export default App
+export default App;
