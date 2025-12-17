@@ -4,6 +4,7 @@ export interface WorkflowInputs {
   searchquery?: string | null;
   type?: Array<"Workflow" | "Agent"> | [];
   limit?: number | null;
+  sort?: "ASC" | "DESC" | null;
 }
 
 export interface TagData {

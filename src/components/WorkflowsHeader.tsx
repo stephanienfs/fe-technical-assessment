@@ -1,35 +1,116 @@
+import { useState, useRef, useEffect } from "react";
+
 interface WorkflowsHeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  onSort?: () => void;
+  onSortChange?: (sort: "ASC" | "DESC" | null) => void;
+  sortOrder?: "ASC" | "DESC" | null;
 }
 
 export default function WorkflowsHeader({
   searchQuery,
   onSearchChange,
-  onSort,
+  onSortChange,
+  sortOrder,
 }: WorkflowsHeaderProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelectSort = (value: "ASC" | "DESC") => {
+    if (sortOrder === value) {
+      onSortChange?.(null); // Deseleccionar si ya está seleccionado
+    } else {
+      onSortChange?.(value);
+    }
+    setIsOpen(false);
+  };
+
   return (
     <div className="flex items-center justify-between mb-6">
       <h1 className="text-2xl font-semibold text-gray-900">Workflows</h1>
       <div className="flex items-center gap-3">
-        <button
-          onClick={onSort}
-          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Sort
-          <svg
-            width="10"
-            height="5"
-            viewBox="0 0 10 5"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <path d="M0 0L4.97455 4.97455L9.9491 0H0Z" fill="#09090B" />
-          </svg>
-        </button>
+            Sort
+            <svg
+              width="10"
+              height="5"
+              viewBox="0 0 10 5"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+            >
+              <path d="M0 0L4.97455 4.97455L9.9491 0H0Z" fill="#09090B" />
+            </svg>
+          </button>
+          {isOpen && (
+            <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+              <button
+                onClick={() => handleSelectSort("ASC")}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
+                  sortOrder === "ASC"
+                    ? "bg-gray-100 text-gray-900"
+                    : "text-gray-700"
+                }`}
+              >
+                ASC
+                {sortOrder === "ASC" && (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M13.3 4L6 11.3L2.7 8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => handleSelectSort("DESC")}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${
+                  sortOrder === "DESC"
+                    ? "bg-gray-100 text-gray-900"
+                    : "text-gray-700"
+                }`}
+              >
+                DESC
+                {sortOrder === "DESC" && (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M13.3 4L6 11.3L2.7 8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
         <div className="relative">
           <input
+            id="search-workflows"
+            name="search"
             type="text"
             placeholder="Search workflows"
             value={searchQuery}

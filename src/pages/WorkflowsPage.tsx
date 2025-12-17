@@ -15,6 +15,7 @@ const AIROPS_WORKSPACE_TOKEN =
 export default function WorkflowsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC" | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -30,6 +31,7 @@ export default function WorkflowsPage() {
       searchquery: debouncedSearchQuery.trim() || undefined,
       type: undefined,
       limit: undefined,
+      sort: sortOrder,
     },
     AIROPS_WORKSPACE_TOKEN
   );
@@ -40,10 +42,6 @@ export default function WorkflowsPage() {
 
   const handleDelete = (workflow: Workflow) => {
     console.log("Delete workflow:", workflow);
-  };
-
-  const handleSort = () => {
-    console.log("Sort workflows");
   };
 
   const handleAddTag = (workflow: Workflow) => {
@@ -58,7 +56,8 @@ export default function WorkflowsPage() {
           <WorkflowsHeader
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            onSort={handleSort}
+            onSortChange={setSortOrder}
+            sortOrder={sortOrder}
           />
           {!loading && !error && workflows.length > 0 && (
             <WorkflowsTable

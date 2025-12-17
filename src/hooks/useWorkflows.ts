@@ -40,6 +40,7 @@ export function useWorkflows(
             : null,
         type: inputs.type && inputs.type.length > 0 ? inputs.type : [],
         limit: inputs.limit && inputs.limit > 0 ? inputs.limit : null,
+        sort: inputs.sort || null,
       };
 
       const result = await executeWorkflow<Workflow[]>(
@@ -68,7 +69,14 @@ export function useWorkflows(
   useEffect(() => {
     loadWorkflows();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appUuid, inputs.searchquery, inputs.type, inputs.limit, workspaceToken]);
+  }, [
+    appUuid,
+    inputs.searchquery,
+    inputs.type,
+    inputs.limit,
+    inputs.sort,
+    workspaceToken,
+  ]);
 
   return {
     workflows,
