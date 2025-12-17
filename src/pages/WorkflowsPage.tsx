@@ -1,129 +1,53 @@
-import { useState, useMemo } from "react";
-import { Workflow, TagData } from "../types/workflow";
+import { useState, useEffect } from "react";
+import { Workflow } from "../types/workflow";
 import Sidebar from "../components/Sidebar";
 import WorkflowsHeader from "../components/WorkflowsHeader";
 import WorkflowsTable from "../components/WorkflowsTable";
+import { useWorkflows } from "../hooks/useWorkflows";
 
-// Mock data - esto se reemplazará con datos de AirOps
-const mockWorkflows: Workflow[] = [
-  {
-    type: "Workflow",
-    name: "Article Writer",
-    icon: "📄",
-    tags: [
-      { label: "tag1", color: "purple" },
-      { label: "tag2", color: "blue" },
-    ],
-    lastUpdated: "Today",
-  },
-  {
-    type: "Agent",
-    name: "Article Writer - Subproj",
-    icon: "📄",
-    tags: [{ label: "Test", color: "purple" }],
-    lastUpdated: "This Week",
-  },
-  {
-    type: "Workflow",
-    name: "Content Idea Generator",
-    icon: "💡",
-    tags: [],
-    lastUpdated: "Yesterday",
-  },
-  {
-    type: "Workflow",
-    name: "Workflow Name",
-    icon: "💡",
-    tags: [],
-    lastUpdated: "2 Days Ago",
-  },
-  {
-    type: "Workflow",
-    name: "Workflow Name",
-    icon: "💡",
-    tags: [],
-    lastUpdated: "Yesterday",
-  },
-  {
-    type: "Agent",
-    name: "Workflow Name",
-    icon: "🍎",
-    tags: [],
-    lastUpdated: "Today",
-  },
-  {
-    type: "Workflow",
-    name: "Workflow Name",
-    icon: "🍎",
-    tags: [],
-    lastUpdated: "Yesterday",
-  },
-  {
-    type: "Workflow",
-    name: "Workflow Name",
-    icon: "✏️",
-    tags: [{ label: "Content Creation", color: "blue" }],
-    lastUpdated: "Today",
-  },
-  {
-    type: "Workflow",
-    name: "Workflow Name",
-    icon: "✏️",
-    tags: [{ label: "Content Creation", color: "blue" }],
-    lastUpdated: "Today",
-  },
-  {
-    type: "Agent",
-    name: "Workflow Name",
-    icon: "📊",
-    tags: [{ label: "Content Creation", color: "blue" }],
-    lastUpdated: "Today",
-  },
-  {
-    type: "Agent",
-    name: "Spreadsheet.csv",
-    icon: "📊",
-    tags: [{ label: "Content Creation", color: "blue" }],
-    lastUpdated: "Today",
-  },
-];
+const AIROPS_APP_UUID =
+  import.meta.env.VITE_AIROPS_APP_UUID ||
+  "5af860c1-d227-4d54-928c-93c622b5f310";
+
+const AIROPS_WORKSPACE_TOKEN =
+  import.meta.env.VITE_AIROPS_WORKSPACE_TOKEN || undefined;
 
 export default function WorkflowsPage() {
-  const [workflows] = useState<Workflow[]>(mockWorkflows);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
-  // Filtrar workflows basado en la búsqueda
-  const filteredWorkflows = useMemo(() => {
-    if (!searchQuery.trim()) return workflows;
-    return workflows.filter(
-      (workflow) =>
-        workflow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        workflow.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        workflow.tags.some((tag) => {
-          const tagLabel = typeof tag === "string" ? tag : tag.label;
-          return tagLabel.toLowerCase().includes(searchQuery.toLowerCase());
-        })
-    );
-  }, [workflows, searchQuery]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const { workflows, loading, error } = useWorkflows(
+    AIROPS_APP_UUID,
+    {
+      searchquery: debouncedSearchQuery.trim() || undefined,
+      type: undefined,
+      limit: undefined,
+    },
+    AIROPS_WORKSPACE_TOKEN
+  );
 
   const handleEdit = (workflow: Workflow) => {
     console.log("Edit workflow:", workflow);
-    // Aquí implementarás la lógica de edición
   };
 
   const handleDelete = (workflow: Workflow) => {
     console.log("Delete workflow:", workflow);
-    // Aquí implementarás la lógica de eliminación
   };
 
   const handleSort = () => {
     console.log("Sort workflows");
-    // Aquí implementarás la lógica de ordenamiento
   };
 
   const handleAddTag = (workflow: Workflow) => {
     console.log("Add tag to workflow:", workflow);
-    // Aquí implementarás la lógica para agregar tags
   };
 
   return (
@@ -136,12 +60,32 @@ export default function WorkflowsPage() {
             onSearchChange={setSearchQuery}
             onSort={handleSort}
           />
-          <WorkflowsTable
-            workflows={filteredWorkflows}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onAddTag={handleAddTag}
-          />
+          {!loading && !error && workflows.length > 0 && (
+            <WorkflowsTable
+              workflows={workflows}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onAddTag={handleAddTag}
+            />
+          )}
+          {loading && (
+            <div className="text-center py-8 text-gray-500">
+              Loading workflows...
+            </div>
+          )}
+          {error && (
+            <div className="text-center py-8 text-red-500">Error: {error}</div>
+          )}
+          {!loading && !error && workflows.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-lg mb-2">
+                No workflows available
+              </div>
+              <div className="text-gray-500 text-sm">
+                Try adjusting your search filters
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

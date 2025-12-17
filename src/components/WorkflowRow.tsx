@@ -1,4 +1,4 @@
-import { Workflow, TagData } from "../types/workflow";
+import { Workflow } from "../types/workflow";
 import TagsList from "./TagsList";
 
 interface WorkflowRowProps {
@@ -14,20 +14,7 @@ export default function WorkflowRow({
   onDelete,
   onAddTag,
 }: WorkflowRowProps) {
-  const normalizedTags: TagData[] = workflow.tags.map((tag, index) => {
-    if (typeof tag === "string") {
-      const colors: TagData["color"][] = [
-        "purple",
-        "blue",
-        "green",
-        "red",
-        "yellow",
-      ];
-      const colorIndex = index % colors.length;
-      return { label: tag, color: colors[colorIndex] };
-    }
-    return tag;
-  });
+  const tags = workflow.tags || [];
 
   return (
     <tr className="hover:bg-gray-50 transition-colors">
@@ -42,9 +29,9 @@ export default function WorkflowRow({
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm">
         <TagsList
-          tags={normalizedTags}
+          tags={tags}
           onAddTag={() => onAddTag?.(workflow)}
-          showAddButton={normalizedTags.length === 0}
+          showAddButton={tags.length === 0}
         />
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
