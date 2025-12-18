@@ -21,7 +21,6 @@ export async function executeWorkflow<T = any>(
       "Content-Type": "application/json",
     };
 
-    console.log("workspaceToken", workspaceToken);
     if (workspaceToken) {
       headers["Authorization"] = `Bearer ${workspaceToken}`;
     } else {
