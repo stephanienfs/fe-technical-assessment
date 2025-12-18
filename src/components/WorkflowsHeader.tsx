@@ -32,7 +32,7 @@ export default function WorkflowsHeader({
 
   const handleSelectSort = (value: "ASC" | "DESC") => {
     if (sortOrder === value) {
-      onSortChange?.(null); // Deseleccionar si ya está seleccionado
+      onSortChange?.(null);
     } else {
       onSortChange?.(value);
     }
