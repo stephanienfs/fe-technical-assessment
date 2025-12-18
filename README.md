@@ -41,12 +41,18 @@ Try to finish within 3 hours. ⏰
    cd [repository-directory]
 2. Install Dependencies:
    ```bash
-   Copy code
    npm install
    ```
-3. Start the Dev Server:
+3. Configure Environment Variables:
    ```bash
-   Copy code
+   cp env.example .env
+   ```
+   Then edit `.env` and add your AirOps credentials:
+   - `VITE_AIROPS_APP_UUID`: Your workflow UUID (found in your workflow's API tab)
+   - `VITE_AIROPS_WORKSPACE_TOKEN`: Your workspace token (found in workspace settings)
+
+4. Start the Dev Server:
+   ```bash
    npm run dev
    ```
 4. Design Link: [Figma Design](https://www.figma.com/design/Tar7tYkKqTuaFdGQFgGthy/Technical-Assessment?node-id=0-1&t=F0fzk15QtPDufiX4-1)
